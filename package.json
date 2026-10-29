@@ -10,7 +10,8 @@
     "test": "vitest run",
     "dev": "vite",
     "build": "vite build",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "server": "node server/index.ts"
   },
   "repository": {
     "type": "git",
@@ -25,9 +26,13 @@
   },
   "homepage": "https://github.com/TimHacker/msn-messenger-reborn#readme",
   "devDependencies": {
+    "@types/ws": "^8.18.2",
     "jsdom": "^29.1.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.5",
     "vitest": "^4.1.12"
+  },
+  "dependencies": {
+    "ws": "^8.22.0"
   }
 }

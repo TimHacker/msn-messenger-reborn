@@ -2,6 +2,8 @@ import { InvalidUsernameError } from "../../domain/username";
 import type { ChatService } from "../../application/chat-service";
 
 export function mountChatUi(root: HTMLElement, chat: ChatService): void {
+  // Attribute selector keeps lookups scoped to this widget even when several share a document.
+  const byId = (id: string) => root.querySelector(`[id="${id}"]`);
   const render = () => (chat.currentUser ? renderChat() : renderJoin());
 
   const renderJoin = () => {
@@ -12,14 +14,14 @@ export function mountChatUi(root: HTMLElement, chat: ChatService): void {
         <button type="submit">Sign in</button>
         <p id="join-error" class="error"></p>
       </form>`;
-    root.querySelector("#join-form")!.addEventListener("submit", (e) => {
+    byId("join-form")!.addEventListener("submit", (e) => {
       e.preventDefault();
       try {
-        chat.join((root.querySelector("#username-input") as HTMLInputElement).value);
+        chat.join((byId("username-input") as HTMLInputElement).value);
         render();
       } catch (err) {
         if (!(err instanceof InvalidUsernameError)) throw err;
-        root.querySelector("#join-error")!.textContent = err.message;
+        byId("join-error")!.textContent = err.message;
       }
     });
   };
@@ -34,11 +36,9 @@ export function mountChatUi(root: HTMLElement, chat: ChatService): void {
           <button id="send-button">Send</button>
         </div>
       </div>`;
-    const input = root.querySelector("#message-input") as HTMLInputElement;
-    const box = root.querySelector("#chat-box") as HTMLElement;
-    const send = () => {
-      chat.send(input.value);
-      input.value = "";
+    const input = byId("message-input") as HTMLInputElement;
+    const box = byId("chat-box") as HTMLElement;
+    const paint = () => {
       box.replaceChildren(
         ...chat.history().map((line) => {
           const p = document.createElement("p");
@@ -46,8 +46,15 @@ export function mountChatUi(root: HTMLElement, chat: ChatService): void {
           return p;
         }),
       );
+      box.scrollTop = box.scrollHeight;
     };
-    root.querySelector("#send-button")!.addEventListener("click", send);
+    chat.onUpdate(() => root.contains(box) && paint());
+    const send = () => {
+      chat.send(input.value);
+      input.value = "";
+    };
+    paint();
+    byId("send-button")!.addEventListener("click", send);
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") send();
     });
