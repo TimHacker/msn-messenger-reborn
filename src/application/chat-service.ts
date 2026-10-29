@@ -1,10 +1,10 @@
 import { Message } from "../domain/message";
 import { Username } from "../domain/username";
-import type { MessageGateway, SessionStore } from "./ports";
+import type { ChatLine, MessageGateway, SessionStore } from "./ports";
 
 export class ChatService {
   private user: Username | null = null;
-  private readonly messages: Message[] = [];
+  private readonly lines: ChatLine[] = [];
   private readonly listeners: Array<() => void> = [];
 
   constructor(
@@ -14,9 +14,14 @@ export class ChatService {
     const saved = session.load();
     if (saved) this.user = Username.create(saved);
     gateway.subscribe((dto) => {
-      const m = Message.create(Username.create(dto.author), dto.text);
-      if (!m) return;
-      this.messages.push(m);
+      if (dto.kind === "system") {
+        if (dto.author === this.user?.value) return; // don't announce yourself to yourself
+        this.lines.push({ text: dto.text, kind: "system" });
+      } else {
+        const m = Message.create(Username.create(dto.author), dto.text);
+        if (!m) return;
+        this.lines.push({ text: m.display(), kind: "chat" });
+      }
       this.listeners.forEach((l) => l());
     });
   }
@@ -24,6 +29,7 @@ export class ChatService {
   join(rawName: string): void {
     this.user = Username.create(rawName);
     this.session.save(this.user.value);
+    this.gateway.publish({ author: this.user.value, text: `${this.user.value} joined the chat`, kind: "system" });
   }
 
   get currentUser(): Username | null {
@@ -37,7 +43,11 @@ export class ChatService {
   }
 
   history(): string[] {
-    return this.messages.map((m) => m.display());
+    return this.lines.map((l) => l.text);
+  }
+
+  entries(): readonly ChatLine[] {
+    return this.lines;
   }
 
   onUpdate(listener: () => void): void {

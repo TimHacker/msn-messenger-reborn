@@ -2,8 +2,8 @@ import { WebSocketServer, WebSocket } from "ws";
 import type { AddressInfo } from "node:net";
 
 const isValid = (v: unknown): boolean => {
-  const m = v as { author?: unknown; text?: unknown };
-  return typeof m?.author === "string" && typeof m?.text === "string" && m.author.trim() !== "" && m.text.length <= 2000;
+  const m = v as { author?: unknown; text?: unknown; kind?: unknown };
+  return typeof m?.author === "string" && typeof m?.text === "string" && m.author.trim() !== "" && m.text.length <= 2000 && (m.kind === undefined || m.kind === "chat" || m.kind === "system");
 };
 
 export function createChatServer(port: number): Promise<{ port: number; close: () => void }> {
@@ -17,8 +17,8 @@ export function createChatServer(port: number): Promise<{ port: number; close: (
         return;
       }
       if (!isValid(parsed)) return;
-      const { author, text } = parsed as { author: string; text: string };
-      const out = JSON.stringify({ author, text });
+      const { author, text, kind } = parsed as { author: string; text: string; kind?: string };
+      const out = JSON.stringify(kind === "system" ? { author, text, kind } : { author, text });
       wss.clients.forEach((c) => c.readyState === WebSocket.OPEN && c.send(out));
     });
   });

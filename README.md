@@ -22,4 +22,6 @@ npm run dev                                # no VITE_WS_URL = local-only (messag
 The `MessageGateway` port has two adapters: `InMemoryHub` (local/tests) and `WebSocketGateway` (browser), served by `server/chat-server.ts`.
 The GitHub Pages deployment is static and has no WebSocket server, so it runs in local-only mode.
 
+Joining explicitly (not restoring a saved session on reload) broadcasts a `"system"` message ("Bob joined the chat") to everyone; the UI renders it as a distinct `.system-notice` line. `ChatMessageDto.kind` is optional (`"chat"` by default), so older clients/messages still work.
+
 Plan: see [Issues](../../issues) and the project board.

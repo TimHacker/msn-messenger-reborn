@@ -25,4 +25,20 @@ describe("WebSocket server (bonus #5)", () => {
     await until(() => got.length === 1);
     expect(got[0]).toEqual({ author: "Alice", text: "over the wire" });
   });
+
+  it("broadcasts system notices and drops an unknown kind", async () => {
+    const server = await createChatServer(0);
+    closers.push(() => server.close());
+    const url = `ws://localhost:${server.port}`;
+    const a = new WebSocketGateway(url);
+    const b = new WebSocketGateway(url);
+    closers.push(() => a.close(), () => b.close());
+    const got: ChatMessageDto[] = [];
+    b.subscribe((m) => got.push(m));
+    a.publish({ author: "Bob", text: "Bob joined the chat", kind: "bogus" as "system" });
+    a.publish({ author: "Bob", text: "Bob joined the chat", kind: "system" });
+    await until(() => got.length === 1);
+    await new Promise((r) => setTimeout(r, 100));
+    expect(got).toEqual([{ author: "Bob", text: "Bob joined the chat", kind: "system" }]);
+  });
 });

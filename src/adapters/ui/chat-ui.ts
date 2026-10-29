@@ -40,9 +40,10 @@ export function mountChatUi(root: HTMLElement, chat: ChatService): void {
     const box = byId("chat-box") as HTMLElement;
     const paint = () => {
       box.replaceChildren(
-        ...chat.history().map((line) => {
+        ...chat.entries().map((line) => {
           const p = document.createElement("p");
-          p.textContent = line;
+          p.textContent = line.text;
+          if (line.kind === "system") p.className = "system-notice";
           return p;
         }),
       );
