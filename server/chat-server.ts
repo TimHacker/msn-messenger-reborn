@@ -7,7 +7,9 @@ const isValid = (v: unknown): boolean => {
   return typeof m?.author === "string" && typeof m?.text === "string" && m.author.trim() !== "" && m.text.length <= 2000 && (m.kind === undefined || m.kind === "chat" || m.kind === "system");
 };
 
-export function createChatServer(port: number): Promise<{ port: number; close: () => void }> {
+export function createChatServer(
+  port: number,
+): Promise<{ port: number; clientCount: () => number; close: () => void }> {
   // Plain HTTP answers health checks; WebSocket upgrades share the same port.
   const http = createServer((req, res) => {
     res.writeHead(req.url === "/healthz" ? 200 : 404).end(req.url === "/healthz" ? "ok" : undefined);
@@ -31,6 +33,7 @@ export function createChatServer(port: number): Promise<{ port: number; close: (
     http.listen(port, () =>
       resolve({
         port: (http.address() as AddressInfo).port,
+        clientCount: () => wss.clients.size,
         close: () => {
           wss.clients.forEach((c) => c.terminate());
           wss.close();

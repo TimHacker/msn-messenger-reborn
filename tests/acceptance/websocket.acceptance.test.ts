@@ -28,6 +28,7 @@ describe("WebSocket server (bonus #5)", () => {
     closers.push(() => a.close(), () => b.close());
     const got: ChatMessageDto[] = [];
     b.subscribe((m) => got.push(m));
+    await until(() => server.clientCount() === 2);
     a.publish({ author: "Alice", text: "over the wire" });
     await until(() => got.length === 1);
     expect(got[0]).toEqual({ author: "Alice", text: "over the wire" });
@@ -42,6 +43,7 @@ describe("WebSocket server (bonus #5)", () => {
     closers.push(() => a.close(), () => b.close());
     const got: ChatMessageDto[] = [];
     b.subscribe((m) => got.push(m));
+    await until(() => server.clientCount() === 2);
     a.publish({ author: "Bob", text: "Bob joined the chat", kind: "bogus" as "system" });
     a.publish({ author: "Bob", text: "Bob joined the chat", kind: "system" });
     await until(() => got.length === 1);
