@@ -14,6 +14,7 @@ export class ChatService {
     const saved = session.load();
     if (saved) this.user = Username.create(saved);
     gateway.subscribe((dto) => {
+      if (dto.kind === "join") return; // client-to-server only
       if (dto.kind === "system") {
         if (dto.author === this.user?.value) return; // don't announce yourself to yourself
         this.lines.push({ text: dto.text, kind: "system" });
@@ -29,7 +30,7 @@ export class ChatService {
   join(rawName: string): void {
     this.user = Username.create(rawName);
     this.session.save(this.user.value);
-    this.gateway.publish({ author: this.user.value, text: `${this.user.value} joined the chat`, kind: "system" });
+    this.gateway.publish({ author: this.user.value, text: "", kind: "join" });
   }
 
   get currentUser(): Username | null {

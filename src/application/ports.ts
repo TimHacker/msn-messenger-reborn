@@ -1,8 +1,8 @@
 export interface ChatMessageDto {
   author: string;
   text: string;
-  /** Omitted means "chat" (backwards compatible). */
-  kind?: "chat" | "system";
+  /** Omitted means "chat" (backwards compatible). "join" is client-to-server only; the server announces it as "system". */
+  kind?: "chat" | "system" | "join";
 }
 
 export interface ChatLine {
