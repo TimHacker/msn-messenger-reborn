@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MSN Messenger Reborn</title>
+    <style>
+      body { font-family: Tahoma, Verdana, sans-serif; background: linear-gradient(#dff1ff, #9fd0f5); min-height: 100vh; margin: 0; display: grid; place-items: center; }
+      .card { background: #fff; border: 2px solid #4a90d9; border-radius: 8px; padding: 1rem; width: 360px; box-shadow: 0 4px 12px #0003; }
+      h1 { font-size: 1.1rem; color: #1d5fa8; margin-top: 0; }
+      #chat-box { height: 240px; overflow-y: auto; border: 1px solid #ccc; padding: .5rem; margin-bottom: .5rem; }
+      #chat-box p { margin: .2rem 0; }
+      .composer { display: flex; gap: .5rem; } .composer input { flex: 1; }
+      .error { color: #c00; min-height: 1em; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

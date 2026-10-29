@@ -1,0 +1,33 @@
+{
+  "name": "msn-messenger-reborn",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TimHacker/msn-messenger-reborn.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/TimHacker/msn-messenger-reborn/issues"
+  },
+  "homepage": "https://github.com/TimHacker/msn-messenger-reborn#readme",
+  "devDependencies": {
+    "jsdom": "^29.1.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^4.1.12"
+  }
+}
