@@ -1,3 +1,4 @@
+import { createServer } from "node:http";
 import { WebSocketServer, WebSocket } from "ws";
 import type { AddressInfo } from "node:net";
 
@@ -7,7 +8,11 @@ const isValid = (v: unknown): boolean => {
 };
 
 export function createChatServer(port: number): Promise<{ port: number; close: () => void }> {
-  const wss = new WebSocketServer({ port });
+  // Plain HTTP answers health checks; WebSocket upgrades share the same port.
+  const http = createServer((req, res) => {
+    res.writeHead(req.url === "/healthz" ? 200 : 404).end(req.url === "/healthz" ? "ok" : undefined);
+  });
+  const wss = new WebSocketServer({ server: http });
   wss.on("connection", (client) => {
     client.on("message", (raw) => {
       let parsed: unknown;
@@ -22,15 +27,16 @@ export function createChatServer(port: number): Promise<{ port: number; close: (
       wss.clients.forEach((c) => c.readyState === WebSocket.OPEN && c.send(out));
     });
   });
-  return new Promise((resolve) =>
-    wss.on("listening", () =>
+  return new Promise((resolve) => {
+    http.listen(port, () =>
       resolve({
-        port: (wss.address() as AddressInfo).port,
+        port: (http.address() as AddressInfo).port,
         close: () => {
           wss.clients.forEach((c) => c.terminate());
           wss.close();
+          http.close();
         },
       }),
-    ),
-  );
+    );
+  });
 }

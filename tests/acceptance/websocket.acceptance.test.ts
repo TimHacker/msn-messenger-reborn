@@ -12,6 +12,13 @@ describe("WebSocket server (bonus #5)", () => {
   const closers: Array<() => void> = [];
   afterEach(() => closers.splice(0).forEach((c) => c()));
 
+  it("answers HTTP health checks (needed by hosts like Render)", async () => {
+    const server = await createChatServer(0);
+    closers.push(() => server.close());
+    const res = await fetch(`http://localhost:${server.port}/healthz`);
+    expect(res.status).toBe(200);
+  });
+
   it("broadcasts a published message to all connected clients", async () => {
     const server = await createChatServer(0);
     closers.push(() => server.close());

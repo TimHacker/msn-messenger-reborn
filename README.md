@@ -22,6 +22,15 @@ npm run dev                                # no VITE_WS_URL = local-only (messag
 The `MessageGateway` port has two adapters: `InMemoryHub` (local/tests) and `WebSocketGateway` (browser), served by `server/chat-server.ts`.
 The GitHub Pages deployment is static. It reads the WebSocket URL from the `VITE_WS_URL` repository variable; if unset it runs in local-only mode.
 
+## Deploy the WebSocket server (Render, free)
+1. Open https://render.com/deploy?repo=https://github.com/TimHacker/msn-messenger-reborn (sign in with GitHub) and apply the `render.yaml` blueprint.
+2. When live, copy the service URL (`https://msn-messenger-ws.onrender.com`) and run:
+```
+gh variable set VITE_WS_URL --body "wss://msn-messenger-ws.onrender.com"
+gh workflow run "Deploy to GitHub Pages"
+```
+The free tier sleeps after ~15 min idle; the first connection after that takes ~30–60s to wake.
+
 ## Deploy the WebSocket server (Azure Container Apps)
 ```
 az login
